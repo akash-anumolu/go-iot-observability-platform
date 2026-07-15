@@ -44,4 +44,3 @@ func TestTelemetryValidationJoinsErrors(t *testing.T) {
 		}
 	}
 }
-

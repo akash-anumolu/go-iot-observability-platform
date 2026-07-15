@@ -70,4 +70,3 @@ func main() {
 	}
 	logger.Info("shutdown complete")
 }
-

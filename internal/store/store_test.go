@@ -53,4 +53,3 @@ func TestMemoryStoreSummary(t *testing.T) {
 		t.Fatalf("unexpected fleet calculations: %+v", summary)
 	}
 }
-

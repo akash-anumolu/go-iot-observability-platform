@@ -12,14 +12,14 @@ import (
 )
 
 type Metrics struct {
-	accepted       atomic.Uint64
-	rejected       atomic.Uint64
-	duplicates     atomic.Uint64
-	queueDepth     atomic.Int64
-	queueCapacity  atomic.Int64
-	workers        atomic.Int64
+	accepted        atomic.Uint64
+	rejected        atomic.Uint64
+	duplicates      atomic.Uint64
+	queueDepth      atomic.Int64
+	queueCapacity   atomic.Int64
+	workers         atomic.Int64
 	processingNanos atomic.Uint64
-	processed      atomic.Uint64
+	processed       atomic.Uint64
 }
 
 func New(queueCapacity, workers int) *Metrics {
@@ -29,10 +29,10 @@ func New(queueCapacity, workers int) *Metrics {
 	return m
 }
 
-func (m *Metrics) Accepted()                    { m.accepted.Add(1) }
-func (m *Metrics) Rejected()                    { m.rejected.Add(1) }
-func (m *Metrics) Duplicate()                   { m.duplicates.Add(1) }
-func (m *Metrics) SetQueueDepth(depth int)      { m.queueDepth.Store(int64(depth)) }
+func (m *Metrics) Accepted()               { m.accepted.Add(1) }
+func (m *Metrics) Rejected()               { m.rejected.Add(1) }
+func (m *Metrics) Duplicate()              { m.duplicates.Add(1) }
+func (m *Metrics) SetQueueDepth(depth int) { m.queueDepth.Store(int64(depth)) }
 func (m *Metrics) ObserveProcessing(d time.Duration) {
 	m.processingNanos.Add(uint64(d))
 	m.processed.Add(1)
@@ -89,4 +89,3 @@ func escapeLabel(value string) string {
 	value = strings.ReplaceAll(value, "\n", "\\n")
 	return strings.ReplaceAll(value, "\"", "\\\"")
 }
-

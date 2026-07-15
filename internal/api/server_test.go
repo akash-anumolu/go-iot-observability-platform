@@ -89,4 +89,3 @@ func testServer(t *testing.T) (http.Handler, *store.MemoryStore, context.CancelF
 	server := NewServer(processor, data, observability, logger, 5*time.Minute)
 	return server.Handler(), data, cancel
 }
-

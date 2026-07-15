@@ -17,15 +17,15 @@ const (
 
 // Telemetry represents one battery observation received from an IoT device.
 type Telemetry struct {
-	EventID      string    `json:"event_id"`
-	DeviceID     string    `json:"device_id"`
-	Timestamp    time.Time `json:"timestamp"`
-	SOC          float64   `json:"soc"`
-	Voltage      float64   `json:"voltage"`
-	Current      float64   `json:"current"`
-	Temperature  float64   `json:"temperature"`
-	CycleCount   int       `json:"cycle_count"`
-	Status       string    `json:"status"`
+	EventID     string    `json:"event_id"`
+	DeviceID    string    `json:"device_id"`
+	Timestamp   time.Time `json:"timestamp"`
+	SOC         float64   `json:"soc"`
+	Voltage     float64   `json:"voltage"`
+	Current     float64   `json:"current"`
+	Temperature float64   `json:"temperature"`
+	CycleCount  int       `json:"cycle_count"`
+	Status      string    `json:"status"`
 }
 
 // Normalize fills safe defaults before validation and ingestion.
@@ -96,4 +96,3 @@ type FleetSummary struct {
 	HighTempDevices    int     `json:"high_temperature_devices"`
 	AverageSOC         float64 `json:"average_soc"`
 }
-
