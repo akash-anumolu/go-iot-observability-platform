@@ -1,0 +1,7 @@
+.git
+.github
+.env
+coverage.out
+*.md
+deploy
+

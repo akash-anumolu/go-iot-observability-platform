@@ -1,0 +1,156 @@
+openapi: 3.1.0
+info:
+  title: Go IoT Observability API
+  version: 1.0.0
+  description: Concurrent battery telemetry ingestion and fleet observability API.
+servers:
+  - url: http://localhost:8080
+paths:
+  /healthz:
+    get:
+      summary: Liveness probe
+      responses:
+        "200":
+          description: Service is alive
+  /readyz:
+    get:
+      summary: Readiness probe
+      responses:
+        "200":
+          description: Service is ready
+  /metrics:
+    get:
+      summary: Prometheus metrics
+      responses:
+        "200":
+          description: Prometheus text exposition
+  /api/v1/telemetry:
+    post:
+      summary: Queue one telemetry event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Telemetry"
+      responses:
+        "202":
+          description: Event accepted into the ingestion queue
+        "422":
+          description: Validation failed
+        "503":
+          description: Ingestion queue is unavailable
+  /api/v1/telemetry/batch:
+    post:
+      summary: Queue up to 500 telemetry events
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [items]
+              properties:
+                items:
+                  type: array
+                  minItems: 1
+                  maxItems: 500
+                  items:
+                    $ref: "#/components/schemas/Telemetry"
+      responses:
+        "202":
+          description: At least one event was queued
+        "422":
+          description: No events were accepted
+  /api/v1/devices:
+    get:
+      summary: List the latest state of every device
+      responses:
+        "200":
+          description: Device state collection
+  /api/v1/devices/{deviceID}:
+    get:
+      summary: Read the latest device state
+      parameters:
+        - $ref: "#/components/parameters/DeviceID"
+      responses:
+        "200":
+          description: Latest telemetry
+        "404":
+          description: Device not found
+  /api/v1/devices/{deviceID}/history:
+    get:
+      summary: Read newest-first bounded device history
+      parameters:
+        - $ref: "#/components/parameters/DeviceID"
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 100
+      responses:
+        "200":
+          description: Telemetry history
+        "404":
+          description: Device not found
+  /api/v1/fleet/summary:
+    get:
+      summary: Read fleet health aggregates
+      responses:
+        "200":
+          description: Fleet summary
+components:
+  parameters:
+    DeviceID:
+      name: deviceID
+      in: path
+      required: true
+      schema:
+        type: string
+  schemas:
+    Telemetry:
+      type: object
+      required:
+        - device_id
+        - soc
+        - voltage
+        - current
+        - temperature
+        - cycle_count
+      properties:
+        event_id:
+          type: string
+          description: Idempotency key. Generated from device and timestamp when omitted.
+        device_id:
+          type: string
+          maxLength: 100
+        timestamp:
+          type: string
+          format: date-time
+          description: Defaults to server time when omitted.
+        soc:
+          type: number
+          minimum: 0
+          maximum: 100
+        voltage:
+          type: number
+          minimum: 0
+          maximum: 1000
+        current:
+          type: number
+          minimum: -2000
+          maximum: 2000
+        temperature:
+          type: number
+          minimum: -60
+          maximum: 150
+        cycle_count:
+          type: integer
+          minimum: 0
+        status:
+          type: string
+          enum: [charging, discharging, idle]
+          default: idle
+

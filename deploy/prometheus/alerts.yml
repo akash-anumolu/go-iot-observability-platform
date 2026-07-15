@@ -1,0 +1,48 @@
+groups:
+  - name: iot-fleet
+    rules:
+      - alert: IoTDeviceOffline
+        expr: time() - iot_device_last_seen_timestamp_seconds > 300
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Device {{ $labels.device_id }} is offline"
+          description: "No telemetry has been received from {{ $labels.device_id }} for more than five minutes."
+
+      - alert: BatterySOCCritical
+        expr: iot_device_soc_percent < 10
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical battery SOC on {{ $labels.device_id }}"
+          description: "Battery state of charge is {{ printf \"%.1f\" $value }}%."
+
+      - alert: BatteryTemperatureHigh
+        expr: iot_device_temperature_celsius > 55
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High temperature on {{ $labels.device_id }}"
+          description: "Battery temperature is {{ printf \"%.1f\" $value }} degrees Celsius."
+
+      - alert: TelemetryQueueBacklog
+        expr: iot_ingestion_queue_depth / iot_ingestion_queue_capacity > 0.8
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Telemetry ingestion queue is above 80%"
+          description: "The worker pool is not draining telemetry as quickly as it arrives."
+
+      - alert: TelemetryIngestionErrors
+        expr: rate(iot_telemetry_ingested_total{result="rejected"}[5m]) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Sustained telemetry rejection rate"
+          description: "The API is rejecting more than one telemetry event per second."
+
